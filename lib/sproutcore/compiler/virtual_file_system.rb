@@ -103,8 +103,8 @@ module SproutCore
         File.dirname(path).split("/").each do |segment|
           next if segment.empty?
 
-          if location[segment].is_a?(String)
-            raise Errno::ENOTDIR "#{current_path}/#{segment} is a file, not a directory"
+          if location[segment].is_a?(VirtualFile)
+            raise Errno::ENOTDIR, "#{current_path}/#{segment} is a file, not a directory"
           end
 
           location[segment] ||= {}
@@ -127,11 +127,12 @@ module SproutCore
           break if location.nil?
           next location if segment.empty?
 
-          if location.is_a?(String)
+          if location.is_a?(VirtualFile)
             raise Errno::ENOTDIR, "#{current_path} is a file, not a directory"
           end
 
           current_path = File.join(current_path, segment)
+
           location[segment]
         end
       end
@@ -144,18 +145,18 @@ module SproutCore
         filename = segments.pop
 
         segments.each do |segment|
-          if location.nil?
-            raise Errno::ENOENT, "#{current_path} does not exist"
-          elsif segment.empty?
-            next
-          end
+          next if segment.empty?
 
           current_path = File.join(current_path, segment)
           location = location[segment]
+
+          raise Errno::ENOENT, "#{current_path} does not exist" unless location
         end
 
-        if location.is_a?(String)
+        if location.is_a?(VirtualFile)
           raise Errno::ENOTDIR, "#{current_path} is a file, not a directory"
+        elsif !location.key?(filename)
+          raise Errno::ENOENT, "#{current_path} does not exist"
         else
           location.delete(filename)
         end

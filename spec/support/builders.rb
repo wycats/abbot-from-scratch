@@ -24,9 +24,8 @@ module SproutCore
 
     class FileBuilder
       def initialize(path, &block)
-          @path = path
-          instance_eval(&block)
-        end
+        @path = path
+        instance_eval(&block)
       end
 
       def write(body)
