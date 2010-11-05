@@ -16,9 +16,14 @@ module SproutCore
         DirectoryBuilder.new(new_root, &block)
       end
 
-      def file(name, &block)
+      def file(name, string = nil, &block)
         file_name = File.join(@root, name)
-        FileBuilder.new(file_name, &block)
+
+        if string
+          FileBuilder.new(file_name) { write string }
+        else
+          FileBuilder.new(file_name, &block)
+        end
       end
     end
 

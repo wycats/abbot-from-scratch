@@ -1,7 +1,10 @@
 module SproutCore
   module Compiler
-    autoload :Invoker,           "sproutcore/compiler/invoker"
-    autoload :Target,            "sproutcore/compiler/target"
+    autoload :Preprocessors,     "sproutcore/compiler/preprocessors"
     autoload :VirtualFileSystem, "sproutcore/compiler/virtual_file_system"
+
+    class << self
+      attr_accessor :intermediate, :output
+    end
   end
 end
