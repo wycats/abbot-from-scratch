@@ -104,7 +104,7 @@ module SproutCore
           next if segment.empty?
 
           if location[segment].is_a?(VirtualFile)
-            raise Errno::ENOTDIR, "#{current_path}/#{segment} is a file, not a directory"
+            raise Errno::EEXIST, "#{current_path}/#{segment} is a file, not a directory"
           end
 
           location[segment] ||= {}
@@ -160,6 +160,37 @@ module SproutCore
         else
           location.delete(filename)
         end
+      end
+    end
+
+    class RealFileSystem < VirtualFileSystem
+      def mtime(path)
+        File.mtime(path)
+      end
+
+    private
+      # raises [Errno::ENOTDIR] if any part of the path other
+      #   than the very end references a file, rather than
+      #   a directory.
+      def create_file(path, contents)
+        FileUtils.mkdir_p(File.dirname(path))
+        File.open(path, "wb") { |file| file.write contents }
+        File.utime(@time.now, @time.now, path)
+      end
+
+      # raises [Errno::ENOTDIR] if any part of the path other
+      #   than the very end references a file, rather than
+      #   a directory.
+      def lookup_file(path)
+        if File.exist?(path)
+          contents = File.read(path)
+          mtime    = File.mtime(path)
+          VirtualFile.new(contents, mtime)
+        end
+      end
+
+      def delete_file(path)
+        FileUtils.rm(path)
       end
     end
 

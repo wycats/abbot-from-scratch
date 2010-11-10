@@ -3,17 +3,15 @@ require "spec_helper"
 describe SproutCore::Compiler::VirtualFileSystem do
   MockTime = Struct.new(:now)
 
+  def file
+    "#{virtual_root}/#{relative_file}"
+  end
+
   def write
     @fs.write(file, "hello zoo")
   end
 
   shared_examples_for "a virtual file system" do
-    before do
-      @time = MockTime.new
-      @time.now = Time.now
-      @fs = SproutCore::Compiler::VirtualFileSystem.new(@time)
-    end
-
     it "knows that non-existant files don't exist" do
       @fs.exist?(file).should be_false
     end
@@ -43,15 +41,16 @@ describe SproutCore::Compiler::VirtualFileSystem do
       now = @time.now = Time.now
 
       write
-      @fs.mtime(file).should == now
+      @fs.mtime(file).to_i.should == now.to_i
     end
 
     it "knows the mtime of updated files" do
       @time.now = Time.now - 100
       write
+      @fs.mtime(file).to_i.should == @time.now.to_i
       now = @time.now = Time.now
       write
-      @fs.mtime(file).should == now
+      @fs.mtime(file).to_i.should == now.to_i
     end
 
     describe "looking for a file under a file" do
@@ -66,7 +65,7 @@ describe SproutCore::Compiler::VirtualFileSystem do
       end
 
       it "raises an error when trying to create" do
-        lambda { @fs.write("#{file}/my", "nope") }.should raise_error(Errno::ENOTDIR)
+        lambda { @fs.write("#{file}/my", "nope") }.should raise_error(Errno::EEXIST)
       end
     end
   end
@@ -74,15 +73,42 @@ describe SproutCore::Compiler::VirtualFileSystem do
   describe "at the root" do
     it_should_behave_like "a virtual file system"
 
-    let(:file) { "/zoo" }
+    let(:relative_file) { "zoo" }
     let(:virtual_root) { "/" }
+
+    before do
+      @time = MockTime.new
+      @time.now = Time.now
+      @fs = SproutCore::Compiler::VirtualFileSystem.new(@time)
+    end
   end
 
   describe "nested" do
     it_should_behave_like "a virtual file system"
 
-    let(:file) { "/zoo/bar" }
-    let(:virtual_root) { "/zoo" }
+    let(:relative_file) { "bar" }
+    let(:virtual_root) { "/zoo/" }
+
+    before do
+      @time = MockTime.new
+      @time.now = Time.now
+      @fs = SproutCore::Compiler::VirtualFileSystem.new(@time)
+    end
+  end
+
+  describe "real file system" do
+    include SproutCore::Spec::TmpDir
+ 
+    it_should_behave_like "a virtual file system"
+
+    let(:relative_file) { "bar" }
+    let(:virtual_root) { tmp.join("zoo") }
+
+    before do
+      @time = MockTime.new
+      @time.now = Time.now
+      @fs = SproutCore::Compiler::RealFileSystem.new(@time)
+    end
   end
 
   describe "virtual or real file system" do
