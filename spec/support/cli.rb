@@ -49,9 +49,19 @@ module SproutCore
         end
       end
 
-      def rake(flags=nil)
+      def run_rake(flags)
         run ["rake", flags].compact.join(" ")
         task.wait
+      end
+
+      def rake(flags=nil)
+        run_rake(flags)
+        err.should == ""
+      end
+
+      def failed_rake(flags=nil)
+        run_rake(flags)
+        err.should_not == ""
       end
 
       def run(command)

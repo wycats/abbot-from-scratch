@@ -2,29 +2,6 @@ require "spec_helper"
 require "rake"
 
 describe "Preprocessing task" do
-  include SproutCore::Spec::TmpDir
-  include SproutCore::Spec::CLIExecution
-  include SproutCore::Compiler
-
-  let(:root) { tmp.join("rake") }
-  let(:intermediate) { root.join("tmp/intermediate") }
-  let(:output) { root.join("tmp/static") }
-
-  before do
-    FileUtils.rm_rf(root)
-    FileUtils.mkdir_p(root)
-  end
-
-  def file_system(path, &block)
-    SproutCore::Spec::DirectoryBuilder.new(tmp.join(path), &block)
-  end
-
-  def rakefile(string)
-    File.open(root.join("Rakefile"), "w") do |file|
-      file.puts string
-    end
-  end
-
   describe "preprocessing a single file" do
     before do
       file_system(root) do
