@@ -26,6 +26,10 @@ module SproutCore
         @entry_map[entry.name] = entry
       end
 
+      def add_optional(entry)
+        @entry_map[entry.name] = entry
+      end
+
       def each
         sort!
 

@@ -67,4 +67,24 @@ describe "Orderer" do
       @orderer.map(&:name).should == ["core", "system", "observable", "split_pane", "pane"]
     end
   end
+
+  describe "optional entries" do
+    before do
+      @orderer.add SimpleEntry.new("bindings.js", ["observable.js", "core"])
+      @orderer.add SimpleEntry.new("core.js", [])
+
+      @orderer.add_optional SimpleEntry.new("observable.js", ["core", "system"])
+      @orderer.add_optional SimpleEntry.new("range_observer.js", ["core", "system.js", "observable"])
+      @orderer.add_optional SimpleEntry.new("system.js", ["core.js"])
+    end
+
+    it "returns a sorted list with sort!" do
+      output = @orderer.sort!
+      output.map(&:name).should == ["core.js", "system.js", "observable.js", "bindings.js"]
+    end
+
+    it "is enumerable" do
+      @orderer.map(&:name).should == ["core.js", "system.js", "observable.js", "bindings.js"]
+    end
+  end
 end
