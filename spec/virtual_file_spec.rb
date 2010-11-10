@@ -36,7 +36,7 @@ describe SproutCore::Compiler::VirtualFileSystem do
 
     it "raises an error when trying to delete non-existant files" do
       write
-      lambda { @fs.delete("#{root}/zomg") }.should raise_error(Errno::ENOENT)
+      lambda { @fs.delete("#{virtual_root}/zomg") }.should raise_error(Errno::ENOENT)
     end
 
     it "knows the mtime of newly created files" do
@@ -75,18 +75,18 @@ describe SproutCore::Compiler::VirtualFileSystem do
     it_should_behave_like "a virtual file system"
 
     let(:file) { "/zoo" }
-    let(:root) { "/" }
+    let(:virtual_root) { "/" }
   end
 
   describe "nested" do
     it_should_behave_like "a virtual file system"
 
     let(:file) { "/zoo/bar" }
-    let(:root) { "/zoo" }
+    let(:virtual_root) { "/zoo" }
   end
 
   describe "virtual or real file system" do
-    include TmpDir
+    include SproutCore::Spec::TmpDir
 
     before do
       @fs = SproutCore::Compiler::VirtualOrRealFileSystem.new
