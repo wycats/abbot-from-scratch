@@ -45,4 +45,33 @@ describe "combining" do
       output.join("runtime.js").read.should == expected.join("\n")
     end
   end
+
+  describe "with preprocessor tasks as input" do
+    before do
+      file_system(root) do
+        directory "lib/runtime" do
+          file "system.js" do
+            write "// BEGIN: system\nsc_super()\n// END: system\n"
+          end
+          file "core.js" do
+            write "require('runtime/system')\n// BEGIN: core\nsc_super()\n// END: core\n"
+          end
+        end
+      end
+
+      rakefile <<-RAKE
+        require "sproutcore"
+        SproutCore::Compiler.intermediate = "#{root}/tmp/intermediate"
+        SproutCore::Compiler.output       = "#{root}/tmp/static"
+        tasks = SproutCore::Compiler::Preprocessors::JavaScriptTask.with_input "lib/runtime/**/*.js", "#{root}"
+        tasks = SproutCore::Compiler::CombineTask.with_tasks tasks, "#{intermediate}/runtime"
+        task(:default => tasks)
+      RAKE
+    end
+
+    it "places the preprocessed files in the intermediate location" do
+      rake
+      output.join("runtime.js").read.should == "// BEGIN: system\narguments.callee.base.apply(this,arguments)\n// END: system\n\nrequire('runtime/system')\n// BEGIN: core\narguments.callee.base.apply(this,arguments)\n// END: core\n"
+    end
+  end
 end
