@@ -29,7 +29,7 @@ describe "combining" do
       file_system(intermediate) do
         directory "runtime" do
           directory "system" do
-            file "apple.js",      "sc_require('system/enumerator')\n// BEGIN: system/apple.js\nEND: system/apple.js"
+            file "apple.js",      "require('runtime/system/enumerator')\n// BEGIN: system/apple.js\nEND: system/apple.js"
             file "binding.js",    "// BEGIN: system/binding.js\n// END: system/binding.js\n"
             file "enumerator.js", "// BEGIN: system/enumerator.js\n// END: system/enumerator.js\n"
           end

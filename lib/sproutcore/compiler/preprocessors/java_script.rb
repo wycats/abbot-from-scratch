@@ -28,7 +28,7 @@ module SproutCore
         # This method will get updated over time as more types of inputs
         # result in different outputs
         def self.output_location(input, package_root)
-          parts = input.sub(%r{^#{package_root}/}, '').split("/") - ["frameworks"]
+          parts = input.sub(%r{^#{package_root}/}, '').split("/") - ["lib", "frameworks"]
           File.join(Compiler.intermediate, parts.join("/"))
         end
 

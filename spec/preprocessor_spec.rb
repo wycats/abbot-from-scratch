@@ -5,7 +5,7 @@ describe "Preprocessing task" do
   describe "preprocessing a single file" do
     before do
       file_system(root) do
-        directory "frameworks/runtime" do
+        directory "lib/runtime" do
           file "core.js" do
             write "// BEGIN: core\nsc_super()\n// END: core\n"
           end
@@ -16,7 +16,7 @@ describe "Preprocessing task" do
         require "sproutcore"
         SproutCore::Compiler.intermediate = "#{root}/tmp/intermediate"
         SproutCore::Compiler.output       = "#{root}/tmp/static"
-        tasks = SproutCore::Compiler::Preprocessors::JavaScriptTask.with_input "frameworks/runtime/**/*.js", "#{root}"
+        tasks = SproutCore::Compiler::Preprocessors::JavaScriptTask.with_input "lib/runtime/**/*.js", "#{root}"
         task(:default => tasks)
       RAKE
     end
@@ -28,20 +28,31 @@ describe "Preprocessing task" do
 
     it "only runs the preprocessed file once" do
       rake "--trace"
-      out.should =~ %r{intermediate/runtime/core\.js\s*$}
+      out.should =~ %r{intermediate/runtime/core\.js \(first_time\)\s*$}
       rake "--trace"
-      out.should =~ %r{intermediate/runtime/core\.js \(not_needed\)\s*$}
+      out.should =~ %r{intermediate/runtime/core\.js \(first_time, not_needed\)\s*$}
     end
 
     describe "multiple files" do
       before do
         file_system(root) do
-          directory "frameworks/runtime" do
+          directory "lib/runtime" do
             file "system.js" do
               write "// BEGIN: system\nsc_super()\n// END: system\n"
             end
+            file "core.js" do
+              write "// BEGIN: core\nsc_super()\n// END: core\n"
+            end
           end
         end
+
+        rakefile <<-RAKE
+          require "sproutcore"
+          SproutCore::Compiler.intermediate = "#{root}/tmp/intermediate"
+          SproutCore::Compiler.output       = "#{root}/tmp/static"
+          tasks = SproutCore::Compiler::Preprocessors::JavaScriptTask.with_input "lib/runtime/**/*.js", "#{root}"
+          task(:default => tasks)
+        RAKE
       end
 
       it "places the preprocessed files in the intermediate location" do

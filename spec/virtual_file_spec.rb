@@ -131,7 +131,7 @@ describe SproutCore::Compiler::VirtualFileSystem do
     end
 
     it "knows the mtime of files on the file system" do
-      @fs.mtime(@ondisk).should be_close(@mtime, 1)
+      @fs.mtime(@ondisk).should be_within(1).of(@mtime)
     end
 
     it "raises on mtime if the file doesn't exist" do
