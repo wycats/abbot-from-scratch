@@ -48,6 +48,8 @@ module SproutCore
         @seen << entry
 
         entry.dependencies.each do |dep|
+          # Temporary hack - eventually support cross-package requires
+          next if dep.split("/")[0] != entry.name.split("/")[0]
           raise "No such entry #{dep} in:\n#{@entries.map(&:name).join("\n")}" unless @entry_map.key?(dep)
           require_entry(@entry_map[dep])
         end
