@@ -43,15 +43,25 @@ module SproutCore
         @sorted
       end
 
-      def require_entry(entry)
+      def require_entry(entry, parent=nil)
         return if @seen.include?(entry)
         @seen << entry
 
         entry.dependencies.each do |dep|
-          # Temporary hack - eventually support cross-package requires
-          next if dep.split("/")[0] != entry.name.split("/")[0]
-          raise "No such entry #{dep} in:\n#{@entries.map(&:name).join("\n")}" unless @entry_map.key?(dep)
-          require_entry(@entry_map[dep])
+          unless @entry_map.key?(dep)
+            # For now, if it's a cross-package dependency, just move on
+            local_package = entry.name.split("/").first
+            dep_package = dep.split("/").first
+
+            next if local_package != dep_package
+
+            str = "No such entry #{dep} "
+            str << "required from #{entry.name} "
+            str << "in:\n#{@entries.map(&:name).join("\n")}"
+            raise str
+          end
+
+          require_entry(@entry_map[dep], entry)
         end
 
         @sorted << entry
