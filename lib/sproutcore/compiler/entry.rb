@@ -11,14 +11,18 @@ module SproutCore
       DEP_REGEX = %r{\b(?:sc_)?require\(['"]([^'"]*)['"]\)}
 
       def initialize(name, body, regex = DEP_REGEX)
-        @name, @body = name, body
+        @name, @raw_body = name, body
         @extension = name.include?(".") && name.split(".").last
         @regex = regex
       end
 
+      def body
+        "\n(function() {\n#{@raw_body}\n})();\n"
+      end
+
       def dependencies
         @dependencies ||= begin
-          @body.scan(@regex).map do |match|
+          @raw_body.scan(@regex).map do |match|
             dep = match.last
 
             if !dep.include?(".") && @extension
