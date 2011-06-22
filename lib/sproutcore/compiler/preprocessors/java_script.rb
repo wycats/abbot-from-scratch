@@ -14,7 +14,7 @@ module SproutCore
       class JavaScriptTask < Rake::FileTask
         # Create a series of Preprocessor tasks for the inputs
         def self.with_input(glob, package_root)
-          Dir[File.join(package_root, glob)].map do |input|
+          Dir[File.join(package_root, glob)].sort.map do |input|
             output = output_location(input, package_root)
 
             # Create a new Preprocessor task to convert the raw input into
