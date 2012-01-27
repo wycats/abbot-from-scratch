@@ -6,11 +6,11 @@ Gem::Specification.new do |s|
   s.name        = "sproutcore"
   s.version     = SproutCore::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
+  s.authors     = ["Yehuda Katz", "Tom Dale"]
+  s.email       = ["wycats@tilde.io", "tom@tilde.io"]
   s.homepage    = "http://rubygems.org/gems/sproutcore"
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = "Simple build tools for SproutCore 2.0 and similar projects"
+  s.description = "A set of simple build tools for SproutCore 2.0, now Ember.js. Re-orders files based on inline require statements."
 
   s.rubyforge_project = "sproutcore"
 
